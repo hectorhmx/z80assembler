@@ -138,8 +138,6 @@ class FirstPassParser():
                                     elif absInst[2]=="NN":
                                         if "#"+realInst[2] in self.symbolTable:
                                             if realInst[0] == "JR":
-                                                print("found JR in second operand")
-                                                print(realInst)
                                                 if cont+1 < len(self.sizeList):
                                                     actual = hextoInt(self.sizeList[cont+1])
                                                     etiqueta = hextoInt(self.symbolTable["#"+realInst[2]][1])

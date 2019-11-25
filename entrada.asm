@@ -28,3 +28,4 @@ RET
 NULLO: LD E, 01H; se ha llegado al caso base, se almacena el valor de 1
 RET
 END
+NELPERRO

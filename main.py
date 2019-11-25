@@ -3,7 +3,7 @@ import lexer
 from pprint import pprint
 import sys
 import string
-from error import error
+from error import error,SalidaException
 
 def intToHex(entero):
     salida = hex(entero)
@@ -66,19 +66,22 @@ if __name__ == "__main__":
     else:
         source = sys.argv[1]
     ###Validamos las rutas
-    validateInput(source)
-    validateInput(tableFile)
+    try:
+        validateInput(source)
+        validateInput(tableFile)
 
-    with open(source) as entrada:
-        ListaInstrucciones = entrada.readlines()
-    ListaInstrucciones = [x.strip("\n") for x in ListaInstrucciones]
-    ###Leeer iun archivo, generar lista de instrucciones
-    
-    ####Codigos, metodo run.
-    tokenList,abstractTokenList,simTable=lexer.run(ListaInstrucciones)
-    sizeList,tList,opCodeList,Tabla,codigoObjeto=firstPassParser.run(tableFile,tokenList,abstractTokenList,simTable)##Este hace los prints
-    strings = toLST(sizeList,opCodeList,tokenList,Tabla)
-    for i in strings:
-        print(i)
-    for i in codigoObjeto:
-        print(i)
+        with open(source) as entrada:
+            ListaInstrucciones = entrada.readlines()
+        ListaInstrucciones = [x.strip("\n") for x in ListaInstrucciones]
+        ###Leeer iun archivo, generar lista de instrucciones
+        
+        ####Codigos, metodo run.
+        tokenList,abstractTokenList,simTable=lexer.run(ListaInstrucciones)
+        sizeList,tList,opCodeList,Tabla,codigoObjeto=firstPassParser.run(tableFile,tokenList,abstractTokenList,simTable)##Este hace los prints
+        strings = toLST(sizeList,opCodeList,tokenList,Tabla)
+        for i in strings:
+            print(i)
+        for i in codigoObjeto:
+            print(i)
+    except SalidaException as se:
+        print(se)
