@@ -27,6 +27,7 @@ class FirstPassParser():
         for instruccion,instructReal in zip(self.abstactTList,self.tList):
             if instructReal[0] == "ORG" and firstInstruction:
                 cL = hextoInt(instructReal[1][:-1])
+                self.sizeList.append(hex(cL))
             elif instructReal[0] == "ORG":
                 error(instructReal,"El ORG no es la primera instrucción o se definio más de un org")
             elif len(instruccion)==1 and instruccion[0]== "NN":
@@ -67,11 +68,11 @@ class FirstPassParser():
         #por las directivas.
         def normalize(absOp,realOp):
             if absOp == "NN" and ("#"+realOp in self.symbolTable):
+                print(absOp,realOp)
                 dir = self.symbolTable["#"+realOp][1]
                 dir = str(dir[2:])
                 if 4 - len(dir) > 0:
                     dir = "0"*(4-len(dir))+dir
-
                 return dir[2:]+dir[:2] 
             elif absOp == "NN" or absOp == "(NN)":
                 c = realOp.replace("h","").replace("H","").replace("(","").replace(")","")
@@ -81,7 +82,8 @@ class FirstPassParser():
             elif absOp == "N":
                 return realOp.replace("h","").replace("H","")    
             else: return "" ##Se asume es un registro o una bandera.           
-        for realInst,absInst in zip(self.tList,self.abstactTList):
+        for cont,instrucciones in enumerate(zip(self.tList,self.abstactTList)):
+            realInst,absInst = instrucciones
             opCode=""
             op1 = ""
             op2 = ""
@@ -106,8 +108,13 @@ class FirstPassParser():
                                 pass
                             else:
                                 if absInst[1]=="NN":#solo las etiquetas usan NN
-                                    if realInst[1] in self.symbolTable:
-                                        op1 = normalize("NN",self.symbolTable[realInst[1]])
+                                    if "#"+realInst[1] in self.symbolTable:
+                                        if realInst[0] == "JR":
+                                            if cont+1 < len(self.sizeList): 
+                                                print(normalize("NN",self.sizeList[cont]))
+                                            op1 = normalize("NN",realInst[1])
+                                        else:
+                                            op1 = normalize("NN",realInst[1])
                                     else:
                                         op1 = normalize("NN",realInst[1])
                                 else:
@@ -123,8 +130,8 @@ class FirstPassParser():
                                         else:
                                             op1 = normalize("NN",realInst[2])
                                     else:op2 = normalize(absInst[2],realInst[2])
-            opCode+=op1 
-            opCode+=op2
+            opCode+=op1.upper()
+            opCode+=op2.upper()
             self.opCodeList.append(opCode)
             
 def run(archivo,TL,ATL,ST):

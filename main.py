@@ -61,7 +61,7 @@ def validateInput(inputString):
 if __name__ == "__main__":
     tableFile = "z80Table.txt"
     if len(sys.argv)==1:
-        source = "entrada.ASAM"
+        source = "entrada.asm"
     else:
         source = sys.argv[1]
     ###Validamos las rutas
