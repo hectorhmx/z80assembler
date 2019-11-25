@@ -8,7 +8,7 @@ REGISTROS_BAND = ['A', 'B', 'C', 'D', 'E', 'H', 'L', 'AF', 'BC', 'DE', 'HL', 'IX
 LIS_ETIQUETAS = []
 T_SIMB = {}
 def error(instruccion,customMessage=""):
-    mensaje = "Error, intrucción incorrecta"
+    mensaje = "Error, intrucción no valida"
     if customMessage:
         mensaje = customMessage
     print(mensaje)
@@ -25,34 +25,26 @@ def parcero(lista):
             indice = cadena.index(";")
             cadena = cadena[:indice]
         if cadena.count(",") > 1:
-            print("Error, del archivo., mas de una coma")
-            print(cadena)
-            sys.exit()
+            error(cadena,"Error del archivo, mas de una coma en la instruccion")
         elif cadena.count(":") > 1:
-            print("Exeso de ':' en la linea:")
-            print(cadena)
-            sys.exit()
+            error(cadena,"Exeso de ':' en la linea:")
         cadena = cadena.replace(","," , ")
         cadena = cadena.replace(":", " : ")
         cadena = cadena.split(" ")
         cadena = [x for x in cadena if x != ""]
         if ":" in cadena and cadena.index(":") != 1:
-            print("Error en el archivo, : no esta después de la etiqueta")
-            sys.exit()
+            error(cadena,"Error en el archivo, : no esta después de la etiqueta")
         if ":" in cadena:
             del(cadena[1])
             instrucciones.append(["#"+cadena[0]])
             if "#"+cadena[0] in simTable:
                 error(cadena,"Error, simbolo ya existente")
-
             simTable["#"+cadena[0]] = [True,None]
             if len(cadena[1:])>0:
                 cadena = cadena[1:]
         
         if "," in cadena and cadena.index(",") != 2:
-            print("Error del archivo, coma en lugar inapropiado")
-            print(cadena)
-            sys.exit()
+            error(cadena,"Error del archivo, coma en lugar inapropiado")
         elif "," in cadena:
             del(cadena[2])
             instrucciones.append(cadena)
@@ -76,102 +68,66 @@ def abstractor(tokenList,simTable):
                 abstractTokenList[-1].append("NN")
             elif token.count("(")>=1 or token.count(")") >=1:##Buscando (NN),(N),(IY+d)
                 if token.count("(")>1 or token.count(")")>1:
-                    print("Error, instrucción no valida")
-                    print(tokenLine)
-                    sys.exit()
+                    error(tokenLine)
                 elif token[0] != "(" or token[-1] != ")":
-                    print("Error, instrucción no valida")
-                    print(tokenLine)
-                    sys.exit()
+                    error(tokenLine)
                 else:
                     inter = token[1:len(token)-1]
                     if all(c in SIMBOLOSNUM for c in inter)or (all(c in SIMBOLOSNUM for c in inter[:2])) and all(c in SIMBOLOSNUM for c in inter[3:] and inter[2]=="+") :
                         if inter in REGISTROS_BAND:
                             abstractTokenList[-1].append(token)
                         elif len(inter)<3:
-                            print("Error, En la linea")
-                            print(token)
-                            sys.exit()
+                            error(tokenLine)
                         elif len(inter) == 3:
                             if inter[2] != "H":
-                                print("Error, instrucción no valida")
-                                print(tokenLine)
-                                sys.exit()
+                                error(tokenLine)
                             elif (all(c in string.hexdigits for c in inter[:-1])):
                                 abstractTokenList[-1].append("(N)")
                             else:
-                                print("Error, instrucción no valida")
-                                print(tokenLine)
-                                sys.exit()
+                                error(tokenLine)
                         elif len(inter) == 5:
                             if inter[4] != "H":
-                                print("Error, instrucción no valida")
-                                print(tokenLine)
-                                sys.exit()
+                                error(tokenLine)
                             elif (all(c in string.hexdigits for c in inter[:-1])):
                                 abstractTokenList[-1].append("(NN)")
                             else:
-                                print("Error, instrucción no valida")
-                                print(tokenLine)
-                                sys.exit()
+                                error(tokenLine)
                         elif inter[:3] in ("IX+","IY+"):##Tal vez, esto haga no acepte menos
                             if len(inter[3:])==3 and inter[-1] == "H":
                                 if (all(c in string.hexdigits for c in inter[3:-1])):
                                     if (127>=int(inter[3:-1],16)):
                                         abstractTokenList[-1].append(inter[:3]+"d")
                                     else:
-                                        print("Error, instrucción no valida")
-                                        print(tokenLine)
-                                        sys.exit()
+                                        error(tokenLine)
                                 else:
-                                    print("Error, instrucción no valida")
-                                    print(tokenLine)
-                                    sys.exit()
+                                    error(tokenLine)
                             else:
-                                    print("Error, instrucción no valida")
-                                    print(tokenLine)
-                                    sys.exit()
+                                    error(tokenLine)
                         else:
-                                    print("Error, instrucción no valida")
-                                    print(tokenLine)
-                                    sys.exit()
+                                    error(tokenLine)
                     else:
-                        print("Error, instruccion no valida")
-                        print(tokenLine)
-                        sys.exit()
+                        error(tokenLine)
             elif (all(c in SIMBOLOSNUM for c in token)):###Buscando N y NN
                 if token in REGISTROS_BAND:
                         abstractTokenList[-1].append(token)
                 elif len(token) < 3:
-                    print("Error, posiblemente sea debido a una falta de H")
-                    print(tokenLine)
-                    sys.exit()
+                    error(tokenLine,"Error, posiblemente sea debido a una falta de H")
                 elif len(token) == 3:
                     if token[2] != "H":
-                        print("Error, instrucción no valida")
-                        print(tokenLine)
-                        sys.exit()
+                        error(tokenLine)
                     elif (all(c in string.hexdigits for c in token[:-1])):
                         abstractTokenList[-1].append("N")
                     else:
-                        print("Error, instrucción no valida")
-                        print(tokenLine)
-                        sys.exit()
+                        error(tokenLine)
                 elif len(token) == 5:
                     if token[4] != "H":
-                        print("Error, instrucción no valida")
-                        print(tokenLine)
-                        sys.exit()
+                        error(tokenLine)
                     elif (all(c in string.hexdigits for c in token[:-1])):
                         abstractTokenList[-1].append("NN")
                     else:
-                        print("Error, instrucción no valida")
-                        print(tokenLine)
-                        sys.exit()
+                        error(tokenLine)
             else:
-                print("Error, instrucción no valida")
-                print(tokenLine)
-                sys.exit()
+                error(tokenLine)
     return abstractTokenList
         
 def run(ListaInstrucciones):
