@@ -4,7 +4,7 @@ import sys
 from pprint import pprint
 from copy import copy
 from error import error
-
+import sumhex
 
 def hextoInt(cadena):
     return int(cadena,16)
@@ -68,7 +68,6 @@ class FirstPassParser():
         #por las directivas.
         def normalize(absOp,realOp):
             if absOp == "NN" and ("#"+realOp in self.symbolTable):
-                print(absOp,realOp)
                 dir = self.symbolTable["#"+realOp][1]
                 dir = str(dir[2:])
                 if 4 - len(dir) > 0:
@@ -110,9 +109,10 @@ class FirstPassParser():
                                 if absInst[1]=="NN":#solo las etiquetas usan NN
                                     if "#"+realInst[1] in self.symbolTable:
                                         if realInst[0] == "JR":
-                                            if cont+1 < len(self.sizeList): 
+                                            if cont+1 < len(self.sizeList):
                                                 print(normalize("NN",self.sizeList[cont]))
-                                            op1 = normalize("NN",realInst[1])
+                                            else:
+                                                print("Aqui se normaliza el codigo")
                                         else:
                                             op1 = normalize("NN",realInst[1])
                                     else:
@@ -148,7 +148,11 @@ def run(archivo,TL,ATL,ST):
         return dir[2:]+dir[:2] 
     for i in ST.keys():
         Tabla+="\n"+str(i)+"\t"+str(dirST(ST[i]))
-    return fparser.sizeList,fparser.tList,fparser.opCodeList,Tabla
+    
+    
+    codigoObjeto=  sumhex.toHEX(fparser.sizeList, fparser.opCodeList) #### DEVUELVE LA CONVERSIÓN DE LA LISTA DE OPCODE Y LA PRIMERA LOCALIDAD DE MEMORIA PARA EL FORMATO .HEX
+
+    return fparser.sizeList,fparser.tList,fparser.opCodeList,Tabla,codigoObjeto
 
 if __name__ == "__main__":
     archivo = "z80_table.txt"

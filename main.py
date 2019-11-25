@@ -17,21 +17,8 @@ def cleanHex(hexnum):
 
 
 
-def archivoHex(sizeList,opCodeList):
-    cadena = "".join(opCodeList)
-    cadena = cadena.strip(" ")
-    tam = len(cadena)
-    lista = []
-    for i in range(tam//32):
-        cadenaAnterior = cadena[:32]
-        lista.append(cadenaAnterior)
-        cadena = cadena[32:]
-    print("")
-    for i in lista:
-        print(i)
-    print(cadena)
 
-def toLST(sizeList,opCodeList,tokenList):
+def toLST(sizeList,opCodeList,tokenList,tabla):
     strings = []
     pre = None
     for x,y,z in zip(sizeList,opCodeList,tokenList):
@@ -45,7 +32,9 @@ def toLST(sizeList,opCodeList,tokenList):
                 z[0] = pre+z[0]
                 pre = None
             strings.append(' {:4s} {:6s}    {:25s}'.format(cleanHex(x),y," ".join(z)))
-
+    strings.append("\n")
+    tabla = tabla.upper().replace("#","")
+    strings.append(tabla)
     return strings
         
 def validateInput(inputString):
@@ -75,8 +64,9 @@ if __name__ == "__main__":
     
     ####Codigos, metodo run.
     tokenList,abstractTokenList,simTable=lexer.run(ListaInstrucciones)
-    sizeList,tList,opCodeList,Tabla=firstPassParser.run(tableFile,tokenList,abstractTokenList,simTable)##Este hace los prints
-    strings = toLST(sizeList,opCodeList,tokenList)
+    sizeList,tList,opCodeList,Tabla,codigoObjeto=firstPassParser.run(tableFile,tokenList,abstractTokenList,simTable)##Este hace los prints
+    strings = toLST(sizeList,opCodeList,tokenList,Tabla)
     for i in strings:
         print(i)
-    archivoHex(sizeList,opCodeList)
+    for i in codigoObjeto:
+        print(i)
