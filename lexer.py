@@ -33,7 +33,7 @@ def parcero(lista):
             del(cadena[1])
             instrucciones.append(["#"+cadena[0]])
             if "#"+cadena[0] in simTable:
-                error(cadena,"Error, simbolo ya existente")
+                error(cadena,"Error, etiqueta previamente definida")
             simTable["#"+cadena[0]] = [True,None]
             if len(cadena[1:])>0:
                 cadena = cadena[1:]

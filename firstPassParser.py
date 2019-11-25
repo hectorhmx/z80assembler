@@ -25,7 +25,6 @@ class FirstPassParser():
         cL = 0
         firstInstruction = True
         for instruccion,instructReal in zip(self.abstactTList,self.tList):
-            print(instruccion,instructReal)
             if instructReal[0] == "ORG" and firstInstruction:
                 cL = hextoInt(instructReal[1][:-1])
             elif instructReal[0] == "ORG":
