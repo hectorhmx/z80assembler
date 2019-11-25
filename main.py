@@ -21,7 +21,9 @@ def cleanHex(hexnum):
 def toLST(sizeList,opCodeList,tokenList,tabla):
     strings = []
     pre = None
+    cont = -1
     for x,y,z in zip(sizeList,opCodeList,tokenList):
+        cont+=1
         if z[0][0] == "#":
             pre = z[0][1:]+": "
         elif z[0][0] != "#":
@@ -31,6 +33,16 @@ def toLST(sizeList,opCodeList,tokenList,tabla):
             if pre != None:
                 z[0] = pre+z[0]
                 pre = None
+            if z[0] == "END" and cont == len(sizeList)-1:
+                x="0000"
+            elif z[0] == "END":
+                error([x,y,],"El end no es la ultima instrucción del programa")
+            elif cont==len(sizeList)-1:
+                strings.append(' {:4s} {:6s}    {:25s}'.format(cleanHex(x),y," ".join(z)))
+                strings.append(' {:4s} {:6s}    {:25s}'.format("0000","","END"))
+                break
+                
+
             strings.append(' {:4s} {:6s}    {:25s}'.format(cleanHex(x),y," ".join(z)))
     strings.append("\n")
     tabla = tabla.upper().replace("#","")
