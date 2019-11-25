@@ -8,6 +8,13 @@ import sumhex
 
 def hextoInt(cadena):
     return int(cadena,16)
+def normalizeJR(etiqueta,actual):
+    if etiqueta>actual:
+        resultado = etiqueta-actual
+    else:
+        resultado = etiqueta-actual
+        resultado += 256
+    return hex(resultado).upper()[2:]
 
 DEBUG = False
 class FirstPassParser():
@@ -110,9 +117,13 @@ class FirstPassParser():
                                     if "#"+realInst[1] in self.symbolTable:
                                         if realInst[0] == "JR":
                                             if cont+1 < len(self.sizeList):
-                                                print(normalize("NN",self.sizeList[cont]))
+                                                actual = hextoInt(self.sizeList[cont+1])
+                                                etiqueta = hextoInt(self.symbolTable["#"+realInst[1]][1])
+                                                op1 = normalizeJR(etiqueta,actual)
                                             else:
-                                                print("Aqui se normaliza el codigo")
+                                                actual = hextoInt(self.sizeList[-1])+hextoInt(size)
+                                                etiqueta = hextoInt(self.symbolTable["#"+realInst[1]][1])
+                                                op1 = normalizeJR(etiqueta,actual)
                                         else:
                                             op1 = normalize("NN",realInst[1])
                                     else:
@@ -125,8 +136,20 @@ class FirstPassParser():
                                     if absInst[2] == "-":
                                         pass
                                     elif absInst[2]=="NN":
-                                        if realInst[2] in self.symbolTable:
-                                            op1 = normalize("NN",self.symbolTable[realInst[2]])
+                                        if "#"+realInst[2] in self.symbolTable:
+                                            if realInst[0] == "JR":
+                                                print("found JR in second operand")
+                                                print(realInst)
+                                                if cont+1 < len(self.sizeList):
+                                                    actual = hextoInt(self.sizeList[cont+1])
+                                                    etiqueta = hextoInt(self.symbolTable["#"+realInst[2]][1])
+                                                    op2 = normalizeJR(etiqueta,actual)
+                                                else:
+                                                    actual = hextoInt(self.sizeList[-1])+hextoInt(size)
+                                                    etiqueta = hextoInt(self.symbolTable["#"+realInst[2]][1])
+                                                    op2 = normalizeJR(etiqueta,actual)
+                                            else:
+                                                op1 = normalize("NN",self.symbolTable[realInst[2]])
                                         else:
                                             op1 = normalize("NN",realInst[2])
                                     else:op2 = normalize(absInst[2],realInst[2])
@@ -145,7 +168,7 @@ def run(archivo,TL,ATL,ST):
         dir = str(dir[2:])
         if 4 - len(dir) > 0:
             dir = "0"*(4-len(dir))+dir
-        return dir[2:]+dir[:2] 
+        return dir
     for i in ST.keys():
         Tabla+="\n"+str(i)+"\t"+str(dirST(ST[i]))
     
