@@ -1,4 +1,4 @@
-
+import sys
 def error(instruccion,customMessage=""):
     mensaje = "Error, intrucción no valida"
     if customMessage:

@@ -5,8 +5,6 @@ import sys
 import string
 from error import error
 
-def hextoInt(cadena):
-    return int(cadena,16)
 def intToHex(entero):
     salida = hex(entero)
     salida = salida[2:]
@@ -53,9 +51,11 @@ def toLST(sizeList,opCodeList,tokenList):
 def validateInput(inputString):
     valid = set(string.ascii_letters)
     valid.add(".")
-    valid |= set(range(10))
-    if not all(v in valid for v in inputString):
-        error(inputString,"Archivo de entrada    no valido")
+    valid |= set(map(str,range(10)))
+    for i in inputString:
+        if i not in valid:
+            error(inputString,"Caracter invalido en nombre archivo:"+"'{}'".format(i))
+
 
 
 if __name__ == "__main__":

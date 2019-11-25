@@ -6,6 +6,9 @@ from copy import copy
 from error import error
 
 
+def hextoInt(cadena):
+    return int(cadena,16)
+
 DEBUG = False
 class FirstPassParser():
     def __init__(self,archivoOpCode,tokenList,abstractTokenL
@@ -20,8 +23,14 @@ class FirstPassParser():
     
     def _firstPassPart1(self):
         cL = 0
+        firstInstruction = True
         for instruccion,instructReal in zip(self.abstactTList,self.tList):
-            if len(instruccion)==1 and instruccion[0]== "NN":
+            print(instruccion,instructReal)
+            if instructReal[0] == "ORG" and firstInstruction:
+                cL = hextoInt(instructReal[1][:-1])
+            elif instructReal[0] == "ORG":
+                error(instructReal,"El ORG no es la primera instrucción o se definio más de un org")
+            elif len(instruccion)==1 and instruccion[0]== "NN":
                 if instructReal[0] in self.symbolTable:
                     self.symbolTable[instructReal[0]][1] = hex(cL)
                     self.sizeList.append(hex(cL))
@@ -49,6 +58,7 @@ class FirstPassParser():
                             print(self.sizeList)
                             print(e)
                             sys.exit()
+            firstInstruction = False
         if DEBUG:
             for i in self.symbolTable():
                 if i[2] ==None:
