@@ -2,6 +2,9 @@ import firstPassParser
 import lexer
 from pprint import pprint
 import sys
+import string
+from error import error
+
 def hextoInt(cadena):
     return int(cadena,16)
 def intToHex(entero):
@@ -30,47 +33,50 @@ def archivoHex(sizeList,opCodeList):
         print(i)
     print(cadena)
 
-    
+def toLST(sizeList,opCodeList,tokenList):
+    strings = []
+    pre = None
+    for x,y,z in zip(sizeList,opCodeList,tokenList):
+        if z[0][0] == "#":
+            pre = z[0][1:]+": "
+        elif z[0][0] != "#":
+            if len(z) == 3:
+                z[1] += "," + z[2]
+                del(z[2])
+            if pre != None:
+                z[0] = pre+z[0]
+                pre = None
+            strings.append(' {:4s} {:6s}    {:25s}'.format(cleanHex(x),y," ".join(z)))
+
+    return strings
         
-        
-        
+def validateInput(inputString):
+    valid = set(string.ascii_letters)
+    valid.add(".")
+    valid |= set(range(10))
+    if not all(v in valid for v in inputString):
+        error(inputString,"Archivo de entrada    no valido")
 
 
 if __name__ == "__main__":
-    archivo = "z80_table.txt"
+    tableFile = "z80Table.txt"
     if len(sys.argv)==1:
-        lol = "entrada.ASAM"
+        source = "entrada.ASAM"
     else:
-        lol = sys.argv[1]
-    ###Lo importante es la ruta
+        source = sys.argv[1]
+    ###Validamos las rutas
+    validateInput(source)
+    validateInput(tableFile)
 
-
-    with open(lol) as entrada:
+    with open(source) as entrada:
         ListaInstrucciones = entrada.readlines()
     ListaInstrucciones = [x.strip("\n") for x in ListaInstrucciones]
     ###Leeer iun archivo, generar lista de instrucciones
     
     ####Codigos, metodo run.
     tokenList,abstractTokenList,simTable=lexer.run(ListaInstrucciones)
-    sizeList,tList,opCodeList,Tabla=firstPassParser.run(archivo,tokenList,abstractTokenList,simTable)##Este hace los prints
-
-    strings = []
-    pre = None
-    for x,y,z in zip(sizeList,opCodeList,tokenList):
-        if z[0][0] == "#":
-            pre = z[0][1:]
-            print(pre)
-        if z[0][0] != "#":
-            if len(z) == 3:
-                z[1]+=","+z[2]
-                del(z[2])
-            strings.append(' {:4s} {:6s}    {:25s}'.format(cleanHex(x),y," ".join(z)))
+    sizeList,tList,opCodeList,Tabla=firstPassParser.run(tableFile,tokenList,abstractTokenList,simTable)##Este hace los prints
+    strings = toLST(sizeList,opCodeList,tokenList)
     for i in strings:
         print(i)
-
     archivoHex(sizeList,opCodeList)
-
-
-
-
-    #

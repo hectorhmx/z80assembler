@@ -3,6 +3,9 @@ import string
 import sys
 from pprint import pprint
 from copy import copy
+from error import error
+
+
 DEBUG = False
 class FirstPassParser():
     def __init__(self,archivoOpCode,tokenList,abstractTokenL
@@ -30,9 +33,7 @@ class FirstPassParser():
             else:
                 size,opCode = self.arbol.search(instruccion)
                 if size == False:
-                    print("Error en la instrucción:")
-                    print(instruccion)
-                    sys.exit()
+                    error(instruccion)
                 try:
                     size = int(size,16)
                     self.sizeList.append(hex(cL))
@@ -48,12 +49,10 @@ class FirstPassParser():
                             print(self.sizeList)
                             print(e)
                             sys.exit()
-                    print("Error")
         if DEBUG:
             for i in self.symbolTable():
                 if i[2] ==None:
-                    print("Error, algunas etiquetas no tienen dirección")
-                    print(self.symbolTable)
+                    error(self.symbolTable,"Error, algunas etiquetas no tienen dirección")
     
     def _secondPass(self):###TAbla opcode no necesariamente tendrá el tamaño de las anteriores
         #por las directivas.
@@ -82,10 +81,7 @@ class FirstPassParser():
             else:
                 size,opCode = self.arbol.search(absInst)
                 if opCode == -1 and DEBUG:
-                    print("Error en la instrucción:")
-                    print(realInst)
-                    print(absInst)
-                    sys.exit()
+                    error(realInst)
                 else:
                     if opCode == "-":
                         if absInst[0] == "DB":

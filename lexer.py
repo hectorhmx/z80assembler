@@ -1,5 +1,7 @@
 import sys,string
 from pprint import pprint
+from error import error
+
 #DIGITOS = '0123456789'
 SIMBOLOS= 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 SIMBOLOSNUM="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -7,13 +9,6 @@ SIMBOLOS_ESP = '():;+'
 REGISTROS_BAND = ['A', 'B', 'C', 'D', 'E', 'H', 'L', 'AF', 'BC', 'DE', 'HL', 'IX', 'IY','SP', 'NZ', 'Z', 'NC', 'C', 'PO', 'PE', 'P', 'M']
 LIS_ETIQUETAS = []
 T_SIMB = {}
-def error(instruccion,customMessage=""):
-    mensaje = "Error, intrucción no valida"
-    if customMessage:
-        mensaje = customMessage
-    print(mensaje)
-    print(instruccion)
-    sys.exit()
 
 
 def parcero(lista):
@@ -60,9 +55,7 @@ def abstractor(tokenList,simTable):
         elif tokenLine[0] in simTable:
             abstractTokenList.append(["NN"])
         else:
-            print("Error, instruccion no valida")
-            print(tokenLine)
-            sys.exit()
+            error(tokenLine)
         for token in tokenLine[1:]:
             if "#"+token in simTable:###Buscando etiquetas
                 abstractTokenList[-1].append("NN")

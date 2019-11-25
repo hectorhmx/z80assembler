@@ -54,7 +54,7 @@ class ParserOpTable():
             if DEBUG:
                 print("correcto",correct)
                 print("incorrecto",incorrect)
-            print("La tabla de opcode parece ser correcta")
+                print("La tabla de opcode parece ser correcta")
 
     def _sortOpTable(self):#ordenar tabla, not really implemented
         lamb = lambda x:x[0]
